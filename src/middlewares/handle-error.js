@@ -1,13 +1,16 @@
-const logger = require('../utils/logger');
-
 const handleError = (err, req, res, next) => {
-    const {statusCode, message} = err;
-    logger.log('error', `${statusCode} ${message}`);
-    res.status(statusCode).json({
+    let {code, message} = err;
+
+    if (err.name === 'AxiosError') code = err.response.status
+
+    console.error('error', `${code} ${message}`);
+
+    res.status(code).json({
         status: 'error',
-        statusCode,
+        code,
         message
     });
+
     next();
 };
 

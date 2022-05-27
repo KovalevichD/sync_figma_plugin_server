@@ -1,18 +1,17 @@
 const {PORT} = require('./common/config');
 const app = require('./app');
-const logger = require('./utils/logger');
 const {exit} = process;
 
 process
     .on('uncaughtException', (err, origin) => {
-        logger.log(
+        console.error(
             'error',
             `Caught exception: ${err}. Exception origin: ${origin}`
         );
         exit(1);
     })
     .on('unhandledRejection', (reason, promise) => {
-        logger.log(
+        console.error(
             'error',
             `Unhandled Rejection at: ${promise}. Reason: ${reason}`
         );

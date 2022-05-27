@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  title: Getting data from Airtable API
+  description: Getting data from Airtable API information
+  version: 1.0.0
+
+servers:
+  - url: /
+
+paths:
+  /bases:
+    parameters:
+      - name: Airtable-Figma-Plugin-ApiKey
+        in: header
+        required: true
+        description: auth token
+        schema:
+          type: string
+    get:
+      tags:
+        - All Bases
+      summary: Get all bases
+      description: Gets all bases (header with apiKey is required)
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: Incorrect header provided
+        404:
+            description: Bases not found
+  /bases/{baseId}:
+    parameters:
+      - name: Airtable-Figma-Plugin-ApiKey
+        in: header
+        required: true
+        description: auth token
+        schema:
+          type: string
+      - name: baseId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Base
+      summary: Get base by ID
+      description: Gets a base by ID
+        e.g. “/bases/123” (header with apiKey is required)
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: Incorrect header provided
+        404:
+          description: Base not found
+  /bases/{baseId}/{tableId}:
+    parameters:
+      - name: Airtable-Figma-Plugin-ApiKey
+        in: header
+        required: true
+        description: auth token
+        schema:
+          type: string
+      - name: baseId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: tableId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Table
+      summary: Get Table by baseId and tableId
+      description: Gets the Table by the Base and table ID
+        (e.g. “/bases/1/123”)
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: Incorrect header provided
+        404:
+          description: Table not found
