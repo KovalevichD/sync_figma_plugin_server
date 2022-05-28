@@ -1,6 +1,7 @@
 const express = require('express');
 const YAML = require('yamljs');
 const path = require('path');
+const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const requestLog = require('./middlewares/request-log');
 const handleError = require('./middlewares/handle-error');
@@ -10,6 +11,7 @@ const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 
 app.use(express.json());
+app.use(cors());
 app.use(requestLog);
 
 app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
