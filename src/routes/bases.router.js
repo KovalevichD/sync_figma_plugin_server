@@ -2,21 +2,13 @@ const router = require('express').Router();
 const {NOT_FOUND, OK} = require('http-status-codes');
 const catchErrors = require('../utils/catch-errors');
 const ErrorHandler = require('../utils/error-handler');
-const {SECRET_KEY} = require('../common/config');
-const axios = require('axios');
-const axiosInstance = axios.create({
-    baseURL: 'https://api.airtable.com/v0/',
-    headers: {
-        "X-Airtable-Client-Secret": SECRET_KEY
-    }
-});
-const authHeader = 'Airtable-Figma-Plugin-ApiKey';
+const {AUTH_HEADER} = require('../common/config');
+const axiosInstance = require('../utils/axiosInstanse');
+
 // /bases
 router.route('/').get(
     catchErrors(async (req, res) => {
-        // const apiKey = 'keyhh33Qu8hzqlfhf';
-        const apiKey = req.get(authHeader)
-
+        const apiKey = req.get(AUTH_HEADER)
         const response = await axiosInstance.get('meta/bases', {headers: {"Authorization": `Bearer ${apiKey}`}});
         const bases = response.data.bases;
 
@@ -32,11 +24,9 @@ router.route('/').get(
 router.route('/:baseId').get(
     catchErrors(async (req, res) => {
         const id = req.params.baseId;
-        const apiKey = req.get(authHeader)
-
+        const apiKey = req.get(AUTH_HEADER)
         const response = await axiosInstance.get(`meta/bases/${id}/tables`, {headers: {"Authorization": `Bearer ${apiKey}`}});
         const tables = response.data.tables;
-//appQeBqBTqUM4PF9G
 
         if (!tables.length) {
             throw new ErrorHandler(NOT_FOUND, 'Tables are not found');
@@ -46,20 +36,33 @@ router.route('/:baseId').get(
     })
 );
 
-// /bases/:baseId/:tableId
-router.route('/:baseId/:tableId').get(
+// /bases/:baseId/:tableId/view/:viewId
+router.route('/:baseId/:tableId/view/:viewId').get(
     catchErrors(async (req, res) => {
-        const {baseId, tableId} = req.params;
-        const apiKey = req.get(authHeader)
-
-        const response = await axiosInstance.get(`${baseId}/${tableId}`, {headers: {"Authorization": `Bearer ${apiKey}`}});
+        const {baseId, tableId, viewId} = req.params;
+        const apiKey = req.get(AUTH_HEADER)
+        const response = await axiosInstance.get(`${baseId}/${tableId}?view=${viewId}`, {headers: {"Authorization": `Bearer ${apiKey}`}});
         const tableData = response.data.records;
-//tblXI8OwWFQYNKCYH
 
         if (!tableData.length) {
-            throw new ErrorHandler(NOT_FOUND, 'Records are not found');
+            throw new ErrorHandler(NOT_FOUND, 'View is not found');
         } else {
             res.status(OK).send(tableData);
+        }
+    })
+);
+// /bases/:baseId/:tableId/record/:recordId
+router.route('/:baseId/:tableId/record/:recordId').get(
+    catchErrors(async (req, res) => {
+        const {baseId, tableId, recordId} = req.params;
+        const apiKey = req.get(AUTH_HEADER)
+        const response = await axiosInstance.get(`${baseId}/${tableId}/${recordId}`, {headers: {"Authorization": `Bearer ${apiKey}`}});
+        const recordFields = response.data.fields;
+
+        if (Object.keys(recordFields).length === 0) {
+            throw new ErrorHandler(NOT_FOUND, 'Record is not found');
+        } else {
+            res.status(OK).send(recordFields);
         }
     })
 );
