@@ -6,7 +6,7 @@ const swaggerUi = require('swagger-ui-express');
 const requestLog = require('./middlewares/request-log');
 const handleError = require('./middlewares/handle-error');
 const basesRouter = require('./routes/bases.router');
-
+const uploadImagesRouter = require('./routes/uploadImages.router');
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 
@@ -27,6 +27,7 @@ app.use('/', (req, res, next) => {
 });
 
 app.use('/bases', basesRouter);
+app.use('/uploadImages', uploadImagesRouter);
 
 app.use(handleError);
 
